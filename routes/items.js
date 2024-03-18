@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const Items = require('../models/Items');
+const slugify = require('slugify');
 
 router.post('/items/create', async ({ fields }, res) => {
-    const { name, slug, brand, model, category, stock, newStock, serialNumber, editing } = fields;
-    const item = new Items({ name, slug, brand, model, category, stock, newStock, serialNumber, editing });
+    const { name, brand, model, category, stock, newStock, serialNumber, editing } = fields;
+    
+    if (!name) {
+        return res.status(400).json({ message: 'Name is required' });
+    }
+
+    const item = new Items({ name, slug: slugify(name), brand, model, category, stock, newStock, serialNumber, editing });
 
     try {
         await item.save();
@@ -48,7 +54,6 @@ router.delete('/item/delete/:id', async (req, res) => {
         }
 
         const deletedItem = await Items.findByIdAndDelete(id);
-        console.log('deletedItem', deletedItem)
         res.json(deletedItem);
     } catch (error) {
         console.log(error)
