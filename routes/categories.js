@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Categories = require('../models/Categories');
+const Items = require('../models/Items');
 
 router.get('/categories', async (req, res) => {
     try {
@@ -58,6 +59,16 @@ router.delete('/category/delete/:id', async (req, res) => {
 
     try {
         const category = await Categories.findByIdAndDelete(id);
+
+       const items = Items.updateMany({ category: category.value }, { category: '' })
+        .then(result => {
+            console.log(result);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
+            console.log('items', items)
         res.json(category);
     } catch (error) {
         console.log('error', error);
